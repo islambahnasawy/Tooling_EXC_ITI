@@ -1,0 +1,3 @@
+folder1 text1.txt source1.source header1.h
+folder2 text2.txt source2.source header2.h
+folder3 text3.txt source3.source header3.h
