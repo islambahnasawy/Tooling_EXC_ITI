@@ -1,9 +1,11 @@
 include config.mk
 #"-include" = ignore error in case file to include is not exist
 allObjs = $(allSrcs:.c=.o)
+allDeps = $(allSrcs:.c=.d)
 
 $(FinalTargetName) : CFLAG = 
 $(allObjs): CFLAG = -c
+$(allDeps): CFLAG = -MM
 link: CFLAG =
 onlyCompile: CFLAG = -c
 
@@ -12,6 +14,10 @@ $(FinalTargetName) : $(allObjs)
 	$(CC) $(CFLAG) $^ -o $(FinalTargetName) 
 $(allObjs) : %.o:%.c
 	$(CC) $(CFLAG) $< -o $@
+
+$(allDeps) : %.d:%.c
+	$(CC) $(CFLAG) $< -o $@	
+	cp $@ Dependencies\
 	
 #$@ = targetname
 #$^ = all prerequisites
@@ -20,18 +26,17 @@ $(allObjs) : %.o:%.c
 
 
 
-.PHONY: clean link onlyCompile
+.PHONY: clean link onlyCompile depend
 clean:
-	rm $(allObjs)
+	rm $(allObjs) 
+	rm $(allDeps)
+	rm Dependencies/*
 	rm $(FinalTargetName)
 
 link: 
 	$(CC) $(CFLAG) $(allObjs) -o $(FinalTargetName)
 
-onlyCompile: 
-	$(CC) $(CFLAG) $(fileSrc1) -o $(fileObj1) 
-	$(CC) $(CFLAG) $(fileSrc2) -o $(fileObj2) 
-	$(CC) $(CFLAG) $(fileSrc3) -o $(fileObj3) 
-	$(CC) $(CFLAG) $(fileSrc4) -o $(fileObj4) 
-	$(CC) $(CFLAG) $(fileSrc5) -o $(fileObj5) 
-	$(CC) $(CFLAG) $(fileSrc6) -o $(fileObj6)
+onlyCompile: $(allObjs)
+depend: $(allDeps)
+all: $(allDeps)
+	$(MAKE) $(FinalTargetName)
