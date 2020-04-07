@@ -1,6 +1,6 @@
 include config.mk
 #"-include" = ignore error in case file to include is not exist
-allObjs = $(fileObj1) $(fileObj2) $(fileObj3) $(fileObj4) $(fileObj5) $(fileObj6)
+allObjs = $(allSrcs:.c=.o)
 
 $(FinalTargetName) : CFLAG = 
 $(allObjs): CFLAG = -c
@@ -10,22 +10,15 @@ onlyCompile: CFLAG = -c
 $(FinalTargetName) : $(allObjs) 
 	@echo Re-compile due to changes in $?
 	$(CC) $(CFLAG) $^ -o $(FinalTargetName) 
-$(fileObj1) : $(fileSrc1) 
-	$(CC) $(CFLAG) $< -o $@ 
-	#$@ = targetname
-	#$^ = all prerequisites
-	#$< = first prerequisite
-	#$? = all newer prerequisites
-$(fileObj2) : $(fileSrc2) 
-	$(CC) $(CFLAG) $< -o $@ 
-$(fileObj3) : $(fileSrc3) 
-	$(CC) $(CFLAG) $< -o $@  
-$(fileObj4) : $(fileSrc4) 
-	$(CC) $(CFLAG) $< -o $@ 
-$(fileObj5) : $(fileSrc5) 
-	$(CC) $(CFLAG) $< -o $@ 
-$(fileObj6) : $(fileSrc6) 
-	$(CC) $(CFLAG) $< -o $@ 
+$(allObjs) : %.o:%.c
+	$(CC) $(CFLAG) $< -o $@
+	
+#$@ = targetname
+#$^ = all prerequisites
+#$< = first prerequisite
+#$? = all newer prerequisites
+
+
 
 .PHONY: clean link onlyCompile
 clean:
