@@ -10,33 +10,43 @@ link: CFLAG =
 onlyCompile: CFLAG = -c
 
 $(FinalTargetName) : $(allObjs) 
-	@echo Re-compile due to changes in $?
-	$(CC) $(CFLAG) $^ -o $(FinalTargetName) 
+	
+	@$(CC) $(CFLAG) $^ -o $(FinalTargetName)
+	@progress.bat
+	@python progress.py 12
 $(allObjs) : %.o:%.c
-	$(CC) $(CFLAG) $< -o $@
+	@$(CC) $(CFLAG) $< -o $@
+	@progress.bat
+	@python progress.py 12
 
-$(allDeps) : %.d:%.c
-	$(CC) $(CFLAG) $< -o $@	
-	cp $@ Dependencies\
+$(allDeps) : %.d:%.c Dependencies
+	@$(CC) $(CFLAG) $< -o $@	
+	@cp $@ Dependencies/
+	@progress.bat
+	@python progress.py 12
 	
 #$@ = targetname
 #$^ = all prerequisites
 #$< = first prerequisite
 #$? = all newer prerequisites
 
+Dependencies:
+	@mkdir Dependencies
 
-
-.PHONY: clean link onlyCompile depend
+.PHONY: clean link onlyCompile depend all
 clean:
-	rm $(allObjs) 
-	rm $(allDeps)
-	rm Dependencies/*
-	rm $(FinalTargetName)
+	@rm $(allObjs) 
+	@rm $(allDeps)
+	@rm Dependencies/*
+	@rm $(FinalTargetName)
+	@rmdir Dependencies
+	@echo '0'>progress.txt
 
 link: 
 	$(CC) $(CFLAG) $(allObjs) -o $(FinalTargetName)
 
 onlyCompile: $(allObjs)
-depend: $(allDeps)
-all: $(allDeps)
+depend: $(allDeps) 
+	
+all: $(allDeps) 
 	$(MAKE) $(FinalTargetName)
